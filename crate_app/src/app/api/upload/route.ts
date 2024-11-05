@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import path from "path";
-import {writeFile} from "fs/promises";
+import {writeFile, unlink} from "fs/promises";
 import { loadXMLFile } from "@/app/lib/xmlParser";
 import { uploadCollection } from "@/app/lib/data";
 
@@ -22,15 +22,8 @@ export async function POST(req: Request,res: Response) {
     try {
         await writeFile(filePath, buffer);
         const rekordboxJson = await loadXMLFile(filePath);
-
-        // for(let i= 0; i<15; i++){
-        //     console.log(rekordboxJson.DJ_PLAYLISTS.COLLECTION.TRACK[2000+i]);
-        // }
-        //1. xml --> json 
-        //2. json  --> sql queries
-        //3. queries --> db
-        //4. delete xml file
-        uploadCollection(rekordboxJson.DJ_PLAYLISTS.COLLECTION.TRACK);
+        await uploadCollection(rekordboxJson.DJ_PLAYLISTS.COLLECTION.TRACK);
+        await unlink(filePath)
         return NextResponse.json({Message: "Success", status: 201});
     } catch(err) {
         console.log("error occured", err);

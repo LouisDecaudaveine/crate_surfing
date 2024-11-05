@@ -8,7 +8,11 @@ import { isAbsolute } from 'path';
 export async function getCollection() {
     try{
         console.log("Fetching Collection data...");
-        const data = await prisma.track.findMany()
+        const data = await prisma.track.findMany({
+            orderBy: {
+                date_added: 'desc',
+            }
+        })
         return data;
     }
     catch(err){
@@ -57,6 +61,8 @@ export async function uploadCollection(trackList: RawParsedTrack[] ){
             })
             
         }
+
+
 
         
     }catch(err){
