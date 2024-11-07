@@ -9,7 +9,7 @@ datasource db {
 }
 
 model Track {
-    track_id    String      @id //need to change to string so that comparison possible with playlist table
+    track_id    String      @id 
     name        String?     @default("Untitled")
     artist      String?
     album       String?
@@ -23,6 +23,7 @@ model Track {
     rating      Int?        @default(0)
     location    String?     
     tonality    String?
+    playlists PlaylistTrack[]
 }
 
 model Playlist {
@@ -31,8 +32,17 @@ model Playlist {
   count         Int?      @default(0)
   path          String
   name          String
-  tracks        String[]  
+  track_ids     String[]  
+  tracks  PlaylistTrack[]
+}
 
+model PlaylistTrack {
+  playlist   Playlist @relation(fields: [playlistId], references: [playlist_id])
+  playlistId String
+  track      Track    @relation(fields: [trackId], references: [track_id])
+  trackId    String
+
+  @@id([playlistId, trackId])
 }
 
 // pg_toast

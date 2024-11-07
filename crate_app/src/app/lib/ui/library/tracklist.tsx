@@ -1,7 +1,8 @@
-import { getCollection } from "../../data"
+import {getCollection ,getPlaylist } from "@/app/lib/data";
 
-export default async function Tracklist(){
-    const data = await getCollection();
+export default async function Tracklist({playlistID} : {playlistID?: string }){
+
+    const data = playlistID ? await getPlaylist(playlistID) : await getCollection();
 
     return(
         <div className="flex-grow bg-white p-4 flex flex-col overflow-hidden">

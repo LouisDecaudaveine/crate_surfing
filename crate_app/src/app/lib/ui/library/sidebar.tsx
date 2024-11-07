@@ -1,5 +1,6 @@
 'use client'
 
+import Link from "next/link";
 // import { playlistsData } from "../../playlistTestData";
 import { getSidebarPlaylists } from "../../data";
 import { Folder, Playlist, SidebarPlaylist } from "../../definitions";
@@ -27,7 +28,7 @@ const folderItem = (node : SidebarPlaylist, key: number) => {
 const playlistItem = (node : SidebarPlaylist, key: number) => {
     return (
         <div key={key}>
-            {node.name}
+            <Link href={`/library/${node.playlist_id}`}> {node.name} </Link>
         </div>
     )
 }

@@ -1,4 +1,3 @@
-import {sql} from '@vercel/postgres';
 import prisma from '@/app/lib/prisma'
 import { Track, RawParsedTrack, RawParsedFolder, SidebarPlaylist } from './definitions';
 import { loadXMLFile } from './xmlParser';
@@ -21,6 +20,29 @@ export async function getCollection() {
     catch(err){
         console.log(err);
     }
+}
+
+export async function getPlaylist(playlistID : string) {
+    try {
+        const playlistWithTracks = await prisma.playlist.findUnique({
+          where: { playlist_id: playlistID },
+          include: {
+            tracks: {
+              include: {
+                track: true, // Fetch full details of each track
+              },
+            },
+          },
+        })
+    
+        console.log(playlistWithTracks);
+        // Map the result to get only track details
+        const tracks = playlistWithTracks?.tracks.map(pt => pt.track)
+    
+        return tracks
+      } catch (error) {
+        console.error("Error fetching playlist tracks:", error)
+      }   
 }
 
 // insert into TRACK (id, track_title, artist, album, tags, bpm, music_key, date_added, blob_id) values("id", "track_title", "artist", "album", "tags", 132, "music_key", "date_added", "blob_id")
@@ -157,7 +179,7 @@ export async function uploadAllPlaylists(playlistFolder: RawParsedFolder, path: 
         count: Number(playlistFolder._Count),
         path: currentPath,
         name: playlistFolder._Name,
-        tracks: [],
+        track_ids: [],
       }  
     })
     for(const container of playlistFolder.NODE){
@@ -178,8 +200,18 @@ export async function uploadAllPlaylists(playlistFolder: RawParsedFolder, path: 
                     count: Number(container._Entries),
                     path: `${currentPath}.${playlistID}`,
                     name: container._Name.replaceAll(" ", "_"),
-                    tracks: trackValues,
+                    track_ids: trackValues,
                 }
+            })
+
+            const trackEntries = trackValues.map(trackId => ({
+                playlistId: playlistID,
+                trackId: trackId,
+            }));
+            
+            await prisma.playlistTrack.createMany({
+                data: trackEntries,
+                skipDuplicates: true,
             })
         }
     }

@@ -22,8 +22,8 @@ export async function POST(req: Request,res: Response) {
     try {
         await writeFile(filePath, buffer);
         const rekordboxJson = await loadXMLFile(filePath);
-        // await uploadCollection(rekordboxJson.DJ_PLAYLISTS.COLLECTION.TRACK);
-        // await uploadAllPlaylists(rekordboxJson.DJ_PLAYLISTS.PLAYLISTS.NODE, "");
+        await uploadCollection(rekordboxJson.DJ_PLAYLISTS.COLLECTION.TRACK);
+        await uploadAllPlaylists(rekordboxJson.DJ_PLAYLISTS.PLAYLISTS.NODE, "");
         await unlink(filePath)
         return NextResponse.json({Message: "Success", status: 201});
     } catch(err) {
