@@ -24,6 +24,13 @@ export type Playlist = {
     tracks: number[];
 }
 
+export type SidebarPlaylist = {
+    type: number;
+    name: string;
+    playlist_id: string;
+    node: SidebarPlaylist[];
+}
+
 export type RawParsedTrack = {
     TEMPO: object[];
     _TrackID: string;
@@ -59,8 +66,17 @@ export interface TrackTable {
     tonality:string;
 }
 
+export type RawParsedFolder = {
+    NODE: (RawParsedFolder | RawParsedPlaylist)[];
+    _Name: string;
+    _Type: "0";
+    _Count: string;
+}
 
-
-export type JobjPlaylist = {}
-
-export type JobjTrack = {}
+export type RawParsedPlaylist = {
+   TRACK: {_Key: string}[] | {_Key: string};
+   _Name: string;
+   _Type: "1";
+   _Entries: string;
+   _KeyType: string; 
+}

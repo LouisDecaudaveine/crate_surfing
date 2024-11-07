@@ -1,8 +1,10 @@
 import {sql} from '@vercel/postgres';
 import prisma from '@/app/lib/prisma'
-import { JobjPlaylist, JobjTrack, Track, RawParsedTrack } from './definitions';
+import { Track, RawParsedTrack, RawParsedFolder, SidebarPlaylist } from './definitions';
 import { loadXMLFile } from './xmlParser';
 import { isAbsolute } from 'path';
+import { randomUUID } from 'crypto';
+import { error } from 'console';
 
 
 export async function getCollection() {
@@ -11,7 +13,8 @@ export async function getCollection() {
         const data = await prisma.track.findMany({
             orderBy: {
                 date_added: 'desc',
-            }
+            },
+            take: 100,
         })
         return data;
     }
@@ -23,13 +26,6 @@ export async function getCollection() {
 // insert into TRACK (id, track_title, artist, album, tags, bpm, music_key, date_added, blob_id) values("id", "track_title", "artist", "album", "tags", 132, "music_key", "date_added", "blob_id")
 
 
-export async function uploadTrack(trackObj: JobjTrack) {
-    try{
-
-    }catch(err){
-
-    }
-}
 
 export async function uploadCollection(trackList: RawParsedTrack[] ){
     try{
@@ -39,7 +35,7 @@ export async function uploadCollection(trackList: RawParsedTrack[] ){
             const batch = trackList.slice(i,i+BATCH_SIZE);
 
             const values = batch.map((track) => ({
-                track_id: (+track._TrackID),
+                track_id: track._TrackID, 
                 name: track._Name,
                 artist: track._Artist,
                 album: track._Album,
@@ -62,10 +58,129 @@ export async function uploadCollection(trackList: RawParsedTrack[] ){
             
         }
 
-
-
-        
     }catch(err){
         console.log("transfer to db failed: ", err);
+    }
+}
+
+function recursiveJsonHelper(
+    depth: number, 
+    id:  string, 
+    data: {
+        playlist_id: string; 
+        path: string[]; 
+        type: number; 
+        name: string;
+    }[]
+){
+    
+    const filteredNodes = data.filter((container) => 
+        container.path[depth] === id && 
+        container.path.length >= depth+2);
+    const childrenNodes: SidebarPlaylist[] = [];
+    const updatedDepth = depth+1;
+    for(const node of filteredNodes){
+        
+        if(node.path.length === depth+2){ 
+            const childNode: SidebarPlaylist = {
+                type: node.type,
+                name: node.name,
+                playlist_id: node.playlist_id,
+                node: node.type === 0 ? recursiveJsonHelper(updatedDepth, node.playlist_id, filteredNodes) : [], 
+            }
+            childrenNodes.push(childNode);
+        }
+        
+    }
+    return childrenNodes;
+}
+
+function playlistQueryToJson(data: {playlist_id: string; path: string; type: number; name: string;}[]){
+
+    const splitPaths = data.map((container) => ({
+        playlist_id: container.playlist_id, 
+        path: container.path.split("."),
+        type: container.type,
+        name: container.name,
+    }))
+
+    splitPaths.forEach((node)=>{
+        node.path.shift();
+    });
+
+    
+
+    //find and pop root from splitPaths
+    const rootIndex = splitPaths.findIndex(item => item.name === "ROOT");
+    if(rootIndex === -1) throw error("ROOT node not found");
+    const root = splitPaths.splice(rootIndex,1)[0] ;
+
+    const jsonData = {
+        type: root.type,
+        name: root.name,
+        playlist_id: root.playlist_id,
+        node: recursiveJsonHelper(0, root.playlist_id, splitPaths),
+    }
+
+
+    return jsonData;
+}
+
+export async function getSidebarPlaylists(){
+    try{
+        console.log("Fetching Playlists for sidebar...");
+        const rawData = await prisma.playlist.findMany({
+            select: {
+                playlist_id: true,
+                path: true,
+                type: true,
+                name: true,
+            },
+        });
+        return playlistQueryToJson(rawData);
+    }catch(err){
+        console.log(err);
+    }
+}
+
+
+export async function uploadAllPlaylists(playlistFolder: RawParsedFolder, path: string) {
+    const id = randomUUID();
+    const currentPath = `${path}.${id}`;
+    // console.log(currentPath, `folder name: ${playlistFolder._Name}`);
+
+    //adding the folder to the db
+    await prisma.playlist.create({
+      data: {
+        playlist_id: id,
+        type: Number(playlistFolder._Type),
+        count: Number(playlistFolder._Count),
+        path: currentPath,
+        name: playlistFolder._Name,
+        tracks: [],
+      }  
+    })
+    for(const container of playlistFolder.NODE){
+        if(container._Type === "0"){
+            uploadAllPlaylists(container, currentPath);
+        }
+        if(container._Type === "1"){
+            const playlistID = randomUUID();
+            const trackValues = Array.isArray(container.TRACK) ? 
+                container.TRACK.map((track) =>track._Key.toString()) : 
+                [container.TRACK?._Key.toString()];
+
+            //adding each playlist to the db
+            await prisma.playlist.create({
+                data: {
+                    playlist_id: playlistID,
+                    type: Number(container._Type),
+                    count: Number(container._Entries),
+                    path: `${currentPath}.${playlistID}`,
+                    name: container._Name.replaceAll(" ", "_"),
+                    tracks: trackValues,
+                }
+            })
+        }
     }
 }

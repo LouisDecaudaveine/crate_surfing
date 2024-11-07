@@ -9,7 +9,7 @@ datasource db {
 }
 
 model Track {
-    track_id    BigInt      @id
+    track_id    String      @id //need to change to string so that comparison possible with playlist table
     name        String?     @default("Untitled")
     artist      String?
     album       String?
@@ -24,3 +24,18 @@ model Track {
     location    String?     
     tonality    String?
 }
+
+model Playlist {
+  playlist_id   String    @id @default(uuid())
+  type          Int
+  count         Int?      @default(0)
+  path          String
+  name          String
+  tracks        String[]  
+
+}
+
+// pg_toast
+// pg_catalog
+// public
+// information_schema

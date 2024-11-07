@@ -1,11 +1,13 @@
 'use client'
 
-import { playlistsData } from "../../playlistTestData";
-import { Folder, Playlist } from "../../definitions";
+// import { playlistsData } from "../../playlistTestData";
+import { getSidebarPlaylists } from "../../data";
+import { Folder, Playlist, SidebarPlaylist } from "../../definitions";
 import { useState } from "react";
 
-const folderItem = (node : Folder, key: number) => {
+const folderItem = (node : SidebarPlaylist, key: number) => {
     const [isOpen, setIsOpen] = useState(false);
+    
 
     const handleClick = () => {
         setIsOpen(!isOpen);
@@ -22,7 +24,7 @@ const folderItem = (node : Folder, key: number) => {
     )
 }
 
-const playlistItem = (node : Playlist, key: number) => {
+const playlistItem = (node : SidebarPlaylist, key: number) => {
     return (
         <div key={key}>
             {node.name}
@@ -31,15 +33,25 @@ const playlistItem = (node : Playlist, key: number) => {
 }
 
 
-export default function Sidebar() {
+export default function Sidebar(
+    {playlistData}: {
+        playlistData : {
+            type: number;
+            name: string;
+            playlist_id: string;
+            node: SidebarPlaylist[];
+        } | undefined
+    } 
+) {
     return (
         <div>
             
             <h3 className="text-2xl font-bold"> PLAYLISTS: </h3>
             Collection
-            {playlistsData.node.map(
+            {playlistData?.node.map(
                 (n, index) => (n.type === 0 ? folderItem(n,index) : playlistItem(n,index))
             )}
         </div>
     )
 }
+
