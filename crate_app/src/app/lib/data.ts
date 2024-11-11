@@ -15,7 +15,7 @@ export async function getCollection() {
             },
             take: 100,
         })
-        return data;
+        return {name: "Collection", tracks: data};
     }
     catch(err){
         console.log(err);
@@ -26,20 +26,29 @@ export async function getPlaylist(playlistID : string) {
     try {
         const playlistWithTracks = await prisma.playlist.findUnique({
           where: { playlist_id: playlistID },
-          include: {
+          select: {
+            name: true,
             tracks: {
-              include: {
-                track: true, // Fetch full details of each track
-              },
+                include: {
+                    track: true, // Fetch full details of each track
+                },
+                orderBy: {
+                    track: {
+                        date_added: 'desc',
+                    },
+                },
             },
-          },
+            
+          }
+          
+          
         })
     
         console.log(playlistWithTracks);
         // Map the result to get only track details
         const tracks = playlistWithTracks?.tracks.map(pt => pt.track)
     
-        return tracks
+        return {name: playlistWithTracks?.name, tracks: tracks}
       } catch (error) {
         console.error("Error fetching playlist tracks:", error)
       }   

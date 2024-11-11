@@ -1,10 +1,10 @@
 'use client'
 
 import Link from "next/link";
-// import { playlistsData } from "../../playlistTestData";
-import { getSidebarPlaylists } from "../../data";
-import { Folder, Playlist, SidebarPlaylist } from "../../definitions";
+import { SidebarPlaylist } from "../../definitions";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
+
 
 const folderItem = (node : SidebarPlaylist, key: number) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -18,7 +18,7 @@ const folderItem = (node : SidebarPlaylist, key: number) => {
     return (
         <div key={key}>
             <button onClick={handleClick}>{node.name}</button>
-            <div className={`${!isOpen ? "hidden" : ""} pl-2 border-l-2 border-slate-700`} >
+            <div className={`${!isOpen ? "hidden" : ""} pl-1 border-l-2 border-slate-700`} >
                 {node.node.map((n,index) => (n.type === 0 ? folderItem(n,index) : playlistItem(n,index)))}
             </div>
         </div>
@@ -26,9 +26,12 @@ const folderItem = (node : SidebarPlaylist, key: number) => {
 }
 
 const playlistItem = (node : SidebarPlaylist, key: number) => {
+    const currentPath = usePathname();
+    const linkPath = `/library/${node.playlist_id}`;
+
     return (
-        <div key={key}>
-            <Link href={`/library/${node.playlist_id}`}> {node.name} </Link>
+        <div className={`${currentPath === linkPath ? "bg-green-900" : ""} pl-1`}key={key}>
+            <Link href={`/library/${node.playlist_id}`} > {node.name} </Link>
         </div>
     )
 }
@@ -41,14 +44,14 @@ export default function Sidebar(
             name: string;
             playlist_id: string;
             node: SidebarPlaylist[];
-        } | undefined
+        } | undefined ; 
     } 
 ) {
     return (
         <div>
             
             <h3 className="text-2xl font-bold"> PLAYLISTS: </h3>
-            Collection
+            <Link href={"/library/"}>Collection</Link>
             {playlistData?.node.map(
                 (n, index) => (n.type === 0 ? folderItem(n,index) : playlistItem(n,index))
             )}

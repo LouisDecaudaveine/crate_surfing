@@ -88,6 +88,7 @@ const DragAndDropUpload = () => {
                 onChange={handleFileInputChange}
                 className="hidden"
                 id="fileUpload"
+                accept='.xml'
             />
             <label htmlFor="fileUpload" className="cursor-pointer text-blue-500 underline">
                 Choose a file
