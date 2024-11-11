@@ -1,7 +1,5 @@
 import prisma from '@/app/lib/prisma'
-import { Track, RawParsedTrack, RawParsedFolder, SidebarPlaylist } from './definitions';
-import { loadXMLFile } from './xmlParser';
-import { isAbsolute } from 'path';
+import { RawParsedTrack, RawParsedFolder, SidebarPlaylist } from './definitions';
 import { randomUUID } from 'crypto';
 import { error } from 'console';
 

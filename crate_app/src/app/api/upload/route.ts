@@ -4,7 +4,7 @@ import {writeFile, unlink} from "fs/promises";
 import { loadXMLFile } from "@/app/lib/xmlParser";
 import { uploadCollection, uploadAllPlaylists } from "@/app/lib/data";
 
-export async function POST(req: Request,res: Response) {
+export async function POST(req: Request) {
    
     const formData = await req.formData();
     const file = formData.get("file") as File;

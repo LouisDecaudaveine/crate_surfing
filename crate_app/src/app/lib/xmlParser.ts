@@ -1,9 +1,12 @@
-import {XMLParser, XMLBuilder, XMLValidator} from "fast-xml-parser";
-import { promises as fs} from "fs";
+import {XMLParser } from "fast-xml-parser";
+// Use XMLValidator  ^^^ when getting round to intergrating file validation
+import { promises as fs, PathLike} from "fs";
 
 
-export async function loadXMLFile(path: String) {
-    const xmlFile = await  fs.readFile(process.cwd() + '/rekordbox_collection.xml');
+export async function loadXMLFile(path: PathLike) {
+    // const xmlFile = await  fs.readFile(process.cwd() + '/rekordbox_collection.xml');
+    const xmlFile = await  fs.readFile(path);
+
     const options = {
         ignoreAttributes: ['BitRate','Comments','Composer', 'DiscNumber', 'Genre', 'Grouping', 'Label', 'Mix', 'Remixer', 'TrackNumber', 'Year'],
         attributeNamePrefix : "_",

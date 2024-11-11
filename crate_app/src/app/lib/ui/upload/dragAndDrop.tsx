@@ -30,7 +30,7 @@ const DragAndDropUpload = () => {
             body: formData,
         })
         .then(response => response.json())
-        .then(data => setSuccessfullyUploaded(true))
+        .then(()=>setSuccessfullyUploaded(true))
         .catch(error => console.error(error));
     }
 
@@ -97,7 +97,7 @@ const DragAndDropUpload = () => {
 
             {file && (fileToBig === false) ? (
             <div className="mt-4 p-2 bg-green-50 border border-green-400 rounded">
-                <p>File ready for upload: <strong>{file.name}</strong></p>
+                <p>{successfullyUploaded ? "Uploaded!" : "Uploading..."}<strong>{file.name}</strong></p>
             </div> 
             ): <></>}
 
