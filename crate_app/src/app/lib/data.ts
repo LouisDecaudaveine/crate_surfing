@@ -2,12 +2,16 @@ import prisma from '@/app/lib/prisma'
 import { RawParsedTrack, RawParsedFolder, SidebarPlaylist } from './definitions';
 import { randomUUID } from 'crypto';
 import { error } from 'console';
+import { use } from 'react';
 
 
-export async function getCollection() {
+export async function getCollection(userId: string) {
     try{
         console.log("Fetching Collection data...");
         const data = await prisma.track.findMany({
+            where:  {
+                user_id: userId
+            },
             orderBy: {
                 date_added: 'desc',
             },
@@ -20,10 +24,10 @@ export async function getCollection() {
     }
 }
 
-export async function getPlaylist(playlistID : string) {
+export async function getPlaylist(playlistID : string, userId:string) {
     try {
         const playlistWithTracks = await prisma.playlist.findUnique({
-          where: { playlist_id: playlistID },
+          where: { playlist_id: playlistID, user_id: userId },
           select: {
             name: true,
             tracks: {
@@ -42,7 +46,6 @@ export async function getPlaylist(playlistID : string) {
           
         })
     
-        console.log(playlistWithTracks);
         // Map the result to get only track details
         const tracks = playlistWithTracks?.tracks.map(pt => pt.track)
     
@@ -52,11 +55,18 @@ export async function getPlaylist(playlistID : string) {
       }   
 }
 
-// insert into TRACK (id, track_title, artist, album, tags, bpm, music_key, date_added, blob_id) values("id", "track_title", "artist", "album", "tags", 132, "music_key", "date_added", "blob_id")
+export async function isUserCollectionEmpty(userId: string){
+    const firstTrackWithUserId = await prisma.track.findFirst({
+        where: {
+            user_id: userId,
+        }
+    });
 
+    if(firstTrackWithUserId) return false;
+    return true;
+}
 
-
-export async function uploadCollection(trackList: RawParsedTrack[] ){
+export async function uploadCollection(trackList: RawParsedTrack[], userId: string){
     try{
         const BATCH_SIZE = 500;
 
@@ -65,6 +75,7 @@ export async function uploadCollection(trackList: RawParsedTrack[] ){
 
             const values = batch.map((track) => ({
                 track_id: track._TrackID, 
+                user_id: userId,
                 name: track._Name,
                 artist: track._Artist,
                 album: track._Album,
@@ -155,10 +166,13 @@ function playlistQueryToJson(data: {playlist_id: string; path: string; type: num
     return jsonData;
 }
 
-export async function getSidebarPlaylists(){
+export async function getSidebarPlaylists(userId: string){
     try{
         console.log("Fetching Playlists for sidebar...");
         const rawData = await prisma.playlist.findMany({
+            where: {
+                user_id: userId,
+            },
             select: {
                 playlist_id: true,
                 path: true,
@@ -173,7 +187,7 @@ export async function getSidebarPlaylists(){
 }
 
 
-export async function uploadAllPlaylists(playlistFolder: RawParsedFolder, path: string) {
+export async function uploadAllPlaylists(playlistFolder: RawParsedFolder, path: string, userId: string) {
     const id = randomUUID();
     const currentPath = `${path}.${id}`;
     // console.log(currentPath, `folder name: ${playlistFolder._Name}`);
@@ -182,6 +196,7 @@ export async function uploadAllPlaylists(playlistFolder: RawParsedFolder, path: 
     await prisma.playlist.create({
       data: {
         playlist_id: id,
+        user_id: userId,
         type: Number(playlistFolder._Type),
         count: Number(playlistFolder._Count),
         path: currentPath,
@@ -191,7 +206,7 @@ export async function uploadAllPlaylists(playlistFolder: RawParsedFolder, path: 
     })
     for(const container of playlistFolder.NODE){
         if(container._Type === "0"){
-            uploadAllPlaylists(container, currentPath);
+            uploadAllPlaylists(container, currentPath, userId);
         }
         if(container._Type === "1"){
             const playlistID = randomUUID();
@@ -203,6 +218,7 @@ export async function uploadAllPlaylists(playlistFolder: RawParsedFolder, path: 
             await prisma.playlist.create({
                 data: {
                     playlist_id: playlistID,
+                    user_id: userId,
                     type: Number(container._Type),
                     count: Number(container._Entries),
                     path: `${currentPath}.${playlistID}`,
