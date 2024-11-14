@@ -4,6 +4,7 @@ import Tracklist from '../lib/ui/library/tracklist';
 import { auth } from '../auth';
 import { isUserCollectionEmpty } from "@/app/lib/data";
 import Link from 'next/link';
+import { error } from 'console';
 
 
 export default async function Page(){
@@ -13,7 +14,7 @@ export default async function Page(){
 
     const session = await auth()
     if(!session) return <div className="m-auto">Not authenticated</div>
-    const userId = session.user?.id
+    const userId = session.user?.id;
 
     if(userId && await isUserCollectionEmpty(userId)) {
         return (
@@ -23,10 +24,11 @@ export default async function Page(){
             </div>
         )
     }
+    if(!userId) throw error("user ID missing");
 
     return (
         <Suspense fallback={<TracklistSkeleton />}>
-            <Tracklist />
+            <Tracklist userID={userId}/>
         </Suspense>
     )
 }

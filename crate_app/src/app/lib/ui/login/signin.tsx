@@ -2,7 +2,7 @@ import { signIn, signOut } from "@/app/auth"
  
 export function SignInButton() {
   return (
-    <form
+    <form className="w-[7rem]"
       action={async () => {
         "use server"
         await signIn();
@@ -16,7 +16,8 @@ export function SignInButton() {
 
 export function SignOutButton() {
   return(
-    <form action={async()=>{
+    <form  className="w-[8rem]"
+      action={async()=>{
         "use server"
         await signOut()
     }}>

@@ -21,7 +21,7 @@ export default async function ContinueButton({session} : {session: Session | nul
                 →
             </Link>
             :
-            <p className="font-semibold">SIGN IN TO START</p>
+            <p className="font-semibold sm:pl-2">SIGN IN TO START</p>
         }
         </>
         

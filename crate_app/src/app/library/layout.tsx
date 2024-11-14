@@ -19,11 +19,11 @@ export default async function Layout({ children }: { children: React.ReactNode }
 
     return(
         <div className='flex flex-col h-screen'>
-            <PageHeader pageName='library'/>
+            <div className="hidden md:block"><PageHeader pageName='library'/></div> 
 
-            <div className='grid grid-cols-[280px_minmax(0,1fr)] flex-grow overflow-hidden'>
+            <div className='md:grid grid-cols-[280px_minmax(0,1fr)] flex-grow overflow-hidden'>
                 {/* playlist sidebar */}
-                <div className='max-w-[280px] bg-green-500 p-4 border-gray-300 overflow-y-auto custom-scrollbar'>
+                <div className='md:max-w-[280px] bg-green-500 pl-4 pr-4  md:p-4 border-gray-300 overflow-y-auto custom-scrollbar'>
                     {session &&
                     <Suspense fallback={<SidebarSkeleton />}>
                         <Sidebar playlistData={SideBarData}  />

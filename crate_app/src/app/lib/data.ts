@@ -2,7 +2,6 @@ import prisma from '@/app/lib/prisma'
 import { RawParsedTrack, RawParsedFolder, SidebarPlaylist } from './definitions';
 import { randomUUID } from 'crypto';
 import { error } from 'console';
-import { use } from 'react';
 
 
 export async function getCollection(userId: string) {
