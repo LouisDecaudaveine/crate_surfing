@@ -65,6 +65,17 @@ export async function isUserCollectionEmpty(userId: string){
     return true;
 }
 
+export async function doesUserExist(userId: string) {
+    const dbUser = await prisma.user.findUnique({
+        where: {
+            id: userId,
+        }
+    })
+
+    if(dbUser) return true;
+    return false;
+}
+
 export async function uploadCollection(trackList: RawParsedTrack[], userId: string){
     try{
         const BATCH_SIZE = 500;

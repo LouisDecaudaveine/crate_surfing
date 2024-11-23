@@ -3,13 +3,21 @@ import path from "path";
 import { auth } from "@/app/auth"
 import {writeFile, unlink} from "fs/promises";
 import { loadXMLFile } from "@/app/lib/xmlParser";
-import { uploadCollection, uploadAllPlaylists } from "@/app/lib/data";
+import { uploadCollection, uploadAllPlaylists, doesUserExist } from "@/app/lib/data";
 
-export const POST = auth( async function POST(req) {
-   
-    const formData = await req.formData();
+export async function  POST(request: Request){
+    const session = await auth();
+    const userId = session?.user?.id ? session?.user?.id : "";
+    const userExists = await doesUserExist(userId)
+
+    if(!userExists){
+        return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
+    }
+
+    const formData = await request.formData();
     const file = formData.get("file") as File;
-    const userId = req.auth?.user?.id;
+
+    
 
     if(!file){
         return NextResponse.json({error: "No file received"}, {status: 400})
@@ -35,4 +43,5 @@ export const POST = auth( async function POST(req) {
         console.log("error occured", err);
         return NextResponse.json({Message: "Failed", status: 500 });
     }
-})
+ 
+}
