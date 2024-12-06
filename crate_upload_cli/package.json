@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "main": "main.js",
   "bin": {
-    "practice": "./dist/main.js"
+    "cratesurf": "./dist/main.js"
   },
   "scripts": {
     "link-cli": "npm unlink crate_upload_cli && npm link",

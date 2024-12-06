@@ -1,6 +1,10 @@
 import { exec } from "child_process";
 import http from 'http';
 import url from 'url';
+import {Token, UserInfoGoogle} from './definitions'
+import EventEmitter from "events";
+
+
 
 
 const successfullCloseTab = 
@@ -13,17 +17,24 @@ const successfullCloseTab =
     </html>
 `
 
-export async function openLoginWebsite(loginURL: string){
+export async function openLoginWebsite(){
+    const RESPONSE_TYPE = "code";
+    const REDIRECT = `http://localhost:${process.env.PORT}/callback`;
+    const SCOPE = [
+        encodeURIComponent("https://www.googleapis.com/auth/userinfo.profile"),
+        encodeURIComponent("https://www.googleapis.com/auth/userinfo.email")
+    ].join(" ");
+    const oAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.CLIENT_ID}&redirect_uri=${REDIRECT}&response_type=${RESPONSE_TYPE}&scope=${SCOPE}`;
     
     const platform = process.platform;
 
     let command : string;
     if (platform === 'win32'){
-        command = `start "" "${loginURL}"`
+        command = `start "" "${oAuthUrl}"`
     } else if(platform == 'darwin'){
-        command = `open ${loginURL}`
+        command = `open ${oAuthUrl}`
     } else{
-        command = `xdg-open ${loginURL}`
+        command = `xdg-open ${oAuthUrl}`
     }
 
     await exec(command, (error) => {
@@ -33,7 +44,7 @@ export async function openLoginWebsite(loginURL: string){
 
 }
 
-export async function setupLoginServer() {
+export async function setupLoginServer(uploadCommandEmitter: EventEmitter) {
     const server = http.createServer(async (req,res) => {
         const parsedUrl = url.parse(req.url || '', true)
         if(parsedUrl.pathname === "/callback"){
@@ -49,7 +60,7 @@ export async function setupLoginServer() {
                 try{
                    
                     //big issues happening here and i really dont get why
-                    const response = await fetch('https://oauth2.googleapis.com/token',{
+                    const tokenResponse = await fetch('https://oauth2.googleapis.com/token',{
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -64,13 +75,26 @@ export async function setupLoginServer() {
                     });
 
                     
-                    const tokens = await response.json();
-                
+                    const tokens = await tokenResponse.json() as Token;
+                    
+                    const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+                        headers:{
+                            'Authorization': `Bearer ${tokens.access_token}`
+                        }
+                    })
 
-                    console.log("Login successful! Token: ", tokens);
+                    const userInfo = await userInfoResponse.json() as UserInfoGoogle;
+
+                    //send data back up to main
+                    uploadCommandEmitter.emit('userLoggedIn', userInfo);
+
+                    console.log("Login successful! User Info: ", userInfo);
                     res.writeHead(200, {"content-type": "text/html"});
                     res.end(successfullCloseTab);
                     
+                    server.close(() => {
+                        console.log("server killed");
+                    })
                 }catch (error) {
                     console.error("Error during token exchange:", error);
                     res.writeHead(500, {'content-type': 'text/plain'});
@@ -78,12 +102,18 @@ export async function setupLoginServer() {
                 }
                 
             }
+
               
             
         } else {
             res.writeHead(404, {"content-type": "text/plain"});
             res.end("Not Found");
         }
+    })
+
+    server.on('end', () => {
+        server.close();
+        console.log("server killed");
     })
 
     server.listen(process.env.PORT, ()=>{
