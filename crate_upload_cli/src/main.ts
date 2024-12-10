@@ -5,8 +5,6 @@ import uploadCommand from "./commands/upload";
 
 dotenv.config();
 
-
-
 // Declare the program
 const program = new Command();
 

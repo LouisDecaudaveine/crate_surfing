@@ -1,6 +1,7 @@
 import { Command } from "commander";
 import { openLoginWebsite, setupLoginServer } from "../login"
 import { UserInfoGoogle } from "../definitions";
+import prisma  from "../prisma"
 import EventEmitter from "events";
 
 
@@ -14,11 +15,18 @@ export default function uploadCommand(program: Command){
 
     const uploadCommandEmitter = new EventEmitter();
 
-    uploadCommandEmitter.on('userLoggedIn', (user: UserInfoGoogle) => {
-        console.log("Emitted user logged in");
+    uploadCommandEmitter.on('userLoggedIn', async (user: UserInfoGoogle) => {
+        console.log("Emitted user logged in...");
         userInfo = user;
 
         // make db call to get user id
+        const dbUserData = await prisma.user.findUnique({
+            where: {
+                email: userInfo.email,
+            }
+        })
+        console.log("db user data: ", dbUserData);
+
     });
 
     uploadCommandEmitter.on('startUpload', () => {
