@@ -1,7 +1,7 @@
 import { exec } from "child_process";
 import http from 'http';
 import url from 'url';
-import {Token, UserInfoGoogle} from './definitions'
+import {Token, UserInfoGoogle} from '../definitions'
 import EventEmitter from "events";
 
 
@@ -86,9 +86,7 @@ export async function setupLoginServer(uploadCommandEmitter: EventEmitter) {
                     const userInfo = await userInfoResponse.json() as UserInfoGoogle;
 
                     //send data back up to main
-                    uploadCommandEmitter.emit('userLoggedIn', userInfo);
-
-                    console.log("Login successful! User Info: ", userInfo);
+                    uploadCommandEmitter.emit('loginSuccess', userInfo);
                     res.writeHead(200, {"content-type": "text/html"});
                     res.end(successfullCloseTab);
                     
@@ -96,7 +94,8 @@ export async function setupLoginServer(uploadCommandEmitter: EventEmitter) {
                         console.log("server killed");
                     })
                 }catch (error) {
-                    console.error("Error during token exchange:", error);
+
+                    uploadCommandEmitter.emit("loginFailed", error)
                     res.writeHead(500, {'content-type': 'text/plain'});
                     res.end(`Token exchange failed: ${error}`);
                 }
