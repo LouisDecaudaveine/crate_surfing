@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import path from "path";
-import { auth } from "@/app/auth"
+import { auth } from "@/auth"
 import {writeFile, unlink} from "fs/promises";
 import { loadXMLFile } from "@/app/lib/xmlParser";
 import { uploadCollection, uploadAllPlaylists, doesUserExist } from "@/app/lib/data";

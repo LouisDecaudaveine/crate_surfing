@@ -1,5 +1,5 @@
 // import Image from "next/image";
-import { auth } from "@/app/auth";
+import { auth } from "@/auth";
 import { SignInButton, SignOutButton } from "@/app/lib/ui/login/signin";
 import ContinueButton from "@/app/lib/ui/home/continueButton";
 

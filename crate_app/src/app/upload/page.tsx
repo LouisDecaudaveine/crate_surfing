@@ -1,4 +1,4 @@
-import { auth } from "@/app/auth";
+import { auth } from "@/auth";
 import DragAndDropUpload from "../lib/ui/upload/dragAndDrop";
 import {isUserCollectionEmpty} from "@/app/lib/data"
 export default async function Page(){

@@ -5,7 +5,7 @@ import PageHeader from "../lib/ui/pageHeader";
 import { Suspense } from "react";
 import { SidebarSkeleton } from "../lib/ui/skeletons";
 import {getSidebarPlaylists, isUserCollectionEmpty} from "@/app/lib/data"
-import { auth } from "@/app/auth";
+import { auth } from "@/auth";
 
 
 
