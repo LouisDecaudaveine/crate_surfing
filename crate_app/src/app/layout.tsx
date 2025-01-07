@@ -4,7 +4,7 @@ import "./globals.css";
 
 
 const notoMono = localFont({
-  src: "./fonts/NotoSansMono.ttf",
+  src: "../fonts/NotoSansMono.ttf",
   variable: "--font-noto-mono",
   weight: "100 900",
 });
