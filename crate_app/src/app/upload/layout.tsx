@@ -1,4 +1,4 @@
-import PageHeader from "../lib/ui/pageHeader"
+import PageHeader from "@/lib/ui/pageHeader"
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     return(

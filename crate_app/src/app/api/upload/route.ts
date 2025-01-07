@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import path from "path";
 import { auth } from "@/auth"
 import {writeFile, unlink} from "fs/promises";
-import { loadXMLFile } from "@/app/lib/xmlParser";
-import { uploadCollection, uploadAllPlaylists, doesUserExist } from "@/app/lib/data";
+import { loadXMLFile } from "@/lib/xmlParser";
+import { uploadCollection, uploadAllPlaylists, doesUserExist } from "@/lib/data";
 
 export async function  POST(request: Request){
     const session = await auth();
@@ -27,7 +27,7 @@ export async function  POST(request: Request){
 
     const filename = file.name.replaceAll(" ", "_");
     const filePath = path.join(process.cwd(), "public/assets/" + filename);
-    console.log(filename);
+    console.log(filePath);
 
     try {
         if(userId){

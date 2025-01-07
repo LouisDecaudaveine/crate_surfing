@@ -1,8 +1,8 @@
 import { Suspense } from 'react';
-import { TracklistSkeleton} from '@/app/lib/ui/skeletons';
-import Tracklist from '../lib/ui/library/tracklist';
-import { auth } from '../../auth';
-import { isUserCollectionEmpty } from "@/app/lib/data";
+import { TracklistSkeleton} from '@/lib/ui/skeletons';
+import Tracklist from '@/lib/ui/library/tracklist';
+import { auth } from '@/auth';
+import { isUserCollectionEmpty } from "@/lib/data";
 import Link from 'next/link';
 import { error } from 'console';
 

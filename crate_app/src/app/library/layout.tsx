@@ -1,10 +1,10 @@
 
 
-import Sidebar from "../lib/ui/library/sidebar";
-import PageHeader from "../lib/ui/pageHeader";
+import Sidebar from "@/lib/ui/library/sidebar";
+import PageHeader from "@/lib/ui/pageHeader";
 import { Suspense } from "react";
-import { SidebarSkeleton } from "../lib/ui/skeletons";
-import {getSidebarPlaylists, isUserCollectionEmpty} from "@/app/lib/data"
+import { SidebarSkeleton } from "@/lib/ui/skeletons";
+import {getSidebarPlaylists, isUserCollectionEmpty} from "@/lib/data"
 import { auth } from "@/auth";
 
 

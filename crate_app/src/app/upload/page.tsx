@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
-import DragAndDropUpload from "../lib/ui/upload/dragAndDrop";
-import {isUserCollectionEmpty} from "@/app/lib/data"
+import DragAndDropUpload from "@/lib/ui/upload/dragAndDrop";
+import {isUserCollectionEmpty} from "@/lib/data"
 export default async function Page(){
     const session = await auth()
     if(!session) return <div className="m-auto">Not authenticated</div>

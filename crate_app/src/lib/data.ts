@@ -1,4 +1,4 @@
-import prisma from '@/app/lib/prisma'
+import prisma from '@/lib/prisma'
 import { RawParsedTrack, RawParsedFolder, SidebarPlaylist } from './definitions';
 import { randomUUID } from 'crypto';
 import { error } from 'console';

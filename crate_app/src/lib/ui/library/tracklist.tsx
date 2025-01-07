@@ -1,4 +1,4 @@
-import {getCollection ,getPlaylist } from "@/app/lib/data";
+import {getCollection ,getPlaylist } from "@/lib/data";
 
 // const fetchDataWithDelay = async () => {
 //     await new Promise((resolve) => setTimeout(resolve, 5000)); // 3-second delay

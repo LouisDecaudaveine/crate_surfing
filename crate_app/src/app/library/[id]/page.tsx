@@ -1,6 +1,6 @@
 import React, { Suspense } from "react";
-import Tracklist from "@/app/lib/ui/library/tracklist";
-import { TracklistSkeleton } from "@/app/lib/ui/skeletons";
+import Tracklist from "@/lib/ui/library/tracklist";
+import { TracklistSkeleton } from "@/lib/ui/skeletons";
 import { auth } from '@/auth';
 import { error } from 'console';
 

@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Session } from "next-auth"
 import { error } from "console";
-import { isUserCollectionEmpty } from "@/app/lib/data";
+import { isUserCollectionEmpty } from "@/lib/data";
 
 export default async function ContinueButton({session} : {session: Session | null}){
 
